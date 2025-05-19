@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-    <PropertyGroup>
+  <PropertyGroup>
         <TargetFramework>net9.0</TargetFramework>
         <LangVersion>13</LangVersion>
         <ImplicitUsings>enable</ImplicitUsings>
@@ -8,21 +8,18 @@
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <Version>0.0.1-alpha </Version>
         <Title>FluentDiagrams for .NET</Title>
-        <Authors>Vinicius do Nascimento Evangelista</Authors>
+        <Authors>Vinicius Evangelista</Authors>
         <Description>FluentDiagrams.NET is a diagrams-as-code library for .NET that allows you to create architecture and system diagrams using a fluent and expressive syntax. Designed to be developer-friendly, it helps you model cloud infrastructure and software systems as code, with flexibility and clarity.</Description>
         <Copyright>© 2025 Vinicius Evangelista</Copyright>
-        <PackageLicenseUrl>https://opensource.org/license/MIT</PackageLicenseUrl>
-        <PackageIcon>Modern Double-Headed Arrow Design.png</PackageIcon>
+        <PackageIcon>icon\fluent-diagrams-net-icon.png</PackageIcon>
         <RepositoryUrl>https://github.com/Vinicius-Evangelista/FluentDiagrams.NET</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
+        <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     </PropertyGroup>
 
-    <ItemGroup>
-      <None Include="..\..\..\Downloads\Modern Double-Headed Arrow Design.png">
-        <Pack>True</Pack>
-        <Link>Modern Double-Headed Arrow Design.png</Link>
-      </None>
-    </ItemGroup>
+  <ItemGroup>
+    <None Include="LICENSE.txt" Pack="true" PackagePath=""/>
+  </ItemGroup>
 
 </Project>
