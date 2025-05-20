@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
-    <None Include="Icon\fluent-diagrams-net-icon.png" Pack="true" PackagePath="" />
+    <None Include="Icon\fluent-diagrams-net-icon.png" Pack="true" PackagePath="/Icon" />
   </ItemGroup>
 
   <PropertyGroup>
