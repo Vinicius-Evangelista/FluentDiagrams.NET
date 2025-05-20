@@ -19,7 +19,10 @@ jobs:
 
       - name: Restore dependencies
         run: dotnet restore ./src/FluentDiagrams.NET/FluentDiagrams.NET.csproj
-
+      
+      - name: Audit NuGet packages
+        run: dotnet list package --vulnerable
+        
       - name: Build
         run: dotnet build --configuration Release --no-restore ./src/FluentDiagrams.NET/
 
