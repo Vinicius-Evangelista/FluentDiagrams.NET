@@ -19,7 +19,7 @@ jobs:
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '9.x' 
+          dotnet-version: '9.x'
 
       - name: Restore dependencies
         run: dotnet restore ./src/FluentDiagrams.NET/FluentDiagrams.NET.csproj
@@ -31,7 +31,7 @@ jobs:
       - uses: github/codeql-action/upload-sarif@v3
         with:
           sarif_file: devskim-results.sarif
-        
+
       - name: Build
         run: dotnet build --configuration Release --no-restore ./src/FluentDiagrams.NET/
 
@@ -42,3 +42,8 @@ jobs:
         env:
           NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
         run: dotnet nuget push ./nupkgs/*.nupkg --api-key $NUGET_API_KEY --source https://api.nuget.org/v3/index.json --skip-duplicate
+
+      - name: Publish to GitHub Packages
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_PACKAGES_TOKEN }}
+        run: dotnet nuget push ./nupkgs/*.nupkg --api-key $GITHUB_TOKEN --source "https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json" --skip-duplicate
