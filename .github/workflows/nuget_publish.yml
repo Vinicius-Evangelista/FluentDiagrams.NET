@@ -24,7 +24,7 @@ jobs:
         run: dotnet build --configuration Release --no-restore ./src/FluentDiagrams.NET/
 
       - name: Pack
-        run: dotnet pack --configuration Release --no-build --output ./nupkgs
+        run: dotnet pack ./src/FluentDiagrams.NET/FluentDiagrams.NET.csproj --configuration Release --no-build --output ./nupkgs
 
       - name: Publish to NuGet.org
         env:
