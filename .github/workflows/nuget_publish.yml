@@ -21,7 +21,7 @@ jobs:
         run: dotnet restore ./src/FluentDiagrams.NET/FluentDiagrams.NET.csproj
 
       - name: Build
-        run: dotnet build --configuration Release --no-restore ./src/FluentDiagrams.NET/FluentDiagrams.NET.csproj
+        run: dotnet build --configuration Release --no-restore ./src/FluentDiagrams.NET/
 
       - name: Pack
         run: dotnet pack --configuration Release --no-build --output ./nupkgs
