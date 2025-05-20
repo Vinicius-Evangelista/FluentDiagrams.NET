@@ -18,10 +18,10 @@ jobs:
           dotnet-version: '9.x' 
 
       - name: Restore dependencies
-        run: dotnet restore
+        run: dotnet restore ./src/FluentDiagrams.NET/FluentDiagrams.NET.csproj
 
       - name: Build
-        run: dotnet build --configuration Release --no-restore
+        run: dotnet build --configuration Release --no-restore ./src/FluentDiagrams.NET/FluentDiagrams.NET.csproj
 
       - name: Pack
         run: dotnet pack --configuration Release --no-build --output ./nupkgs
