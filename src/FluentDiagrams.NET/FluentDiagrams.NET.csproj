@@ -15,7 +15,7 @@
     <Authors>Vinicius Evangelista</Authors>
     <Description>FluentDiagrams.NET is a diagrams-as-code library for .NET that allows you to create architecture and system diagrams using a fluent and expressive syntax. Designed to be developer-friendly, it helps you model cloud infrastructure and software systems as code, with flexibility and clarity.</Description>
     <Copyright>© 2025 Vinicius Evangelista</Copyright>
-    <PackageIcon>fluent-diagrams-net-icon.png</PackageIcon>
+    <PackageIcon>Icon/fluent-diagrams-net-icon.png</PackageIcon>
     <RepositoryUrl>https://github.com/Vinicius-Evangelista/FluentDiagrams.NET</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
