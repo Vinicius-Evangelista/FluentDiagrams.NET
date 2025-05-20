@@ -15,7 +15,7 @@ jobs:
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: 'netstandard2.0' 
+          dotnet-version: '9.x' 
 
       - name: Restore dependencies
         run: dotnet restore ./src/FluentDiagrams.NET/FluentDiagrams.NET.csproj
