@@ -1,15 +1,15 @@
-name: Publish NuGet package
+name: Build and Test
 
 on:
-  push:
+  pull_request:
     branches:
       - main
-
+      
 permissions:
   security-events: write
 
 jobs:
-  build:
+  build-and-test:
     runs-on: ubuntu-latest
 
     steps:
@@ -21,6 +21,13 @@ jobs:
         with:
           dotnet-version: '9.x'
 
+      - name: Cache NuGet packages
+        uses: actions/cache@v3
+        with:
+          path: ~/.nuget/packages
+          key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj', '**/global.json') }}
+          restore-keys: |
+            ${{ runner.os }}-nuget-
       - name: Restore dependencies
         run: dotnet restore ./src/FluentDiagrams.NET/FluentDiagrams.NET.csproj
 
@@ -28,6 +35,7 @@ jobs:
         run: dotnet list ./src/FluentDiagrams.NET/FluentDiagrams.NET.csproj package --vulnerable
 
       - uses: microsoft/DevSkim-Action@v1
+
       - uses: github/codeql-action/upload-sarif@v3
         with:
           sarif_file: devskim-results.sarif
@@ -35,15 +43,14 @@ jobs:
       - name: Build
         run: dotnet build --configuration Release --no-restore ./src/FluentDiagrams.NET/
 
+      - name: Test
+        run: dotnet test ./src/FluentDiagrams.NET/FluentDiagrams.NET.csproj --configuration Release --no-build
+
       - name: Pack
         run: dotnet pack ./src/FluentDiagrams.NET/FluentDiagrams.NET.csproj --configuration Release --no-build --output ./nupkgs
 
-      - name: Publish to NuGet.org
-        env:
-          NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
-        run: dotnet nuget push ./nupkgs/*.nupkg --api-key $NUGET_API_KEY --source https://api.nuget.org/v3/index.json --skip-duplicate
-
-      - name: Publish to GitHub Packages
-        env:
-          GITHUB_TOKEN: ${{ secrets.GH_PACKAGES_TOKEN }}
-        run: dotnet nuget push ./nupkgs/*.nupkg --api-key $GITHUB_TOKEN --source "https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json" --skip-duplicate
+      - name: Save package artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: nupkg
+          path: ./nupkgs/*.nupkg

@@ -1,28 +1,40 @@
-# Package readme title, e.g., display name or title of the package (optional)
+# FluentDiagrams.NET
 
-Start with a clear and concise description: A brief overview of what your package is and does, also what problem it solves.
+FluentDiagrams.NET is a diagrams-as-code library for .NET that allows you to create architecture and system diagrams using a fluent and expressive syntax. Designed to be developer-friendly, it helps you model cloud infrastructure and software systems as code, with flexibility and clarity.
 
 ## Getting started
 
-Explain how to use your package, provide clear and concise getting started instructions, including any necessary steps.
+To get started with FluentDiagrams.NET, follow these steps:
 
 ### Prerequisites
 
-What are specific minimum requirements to use your packages? Consider excluding this section if your package works without any additional setup beyond simple package installation.
+- .NET SDK 9.x or later
+
+### Installation
+
+You can install FluentDiagrams.NET via NuGet Package Manager:
+
+```bash
+dotnet add package FluentDiagrams.NET --version 0.0.1-alpha
+```
 
 ## Usage
 
-Examples about how to use your package by providing code snippets/example images, or samples links on GitHub if applicable. 
-
-- Provide sample code using code snippets
-- Include screenshots, diagrams, or other visual help users better understand how to use your package
+building :)
 
 ## Additional documentation
 
-Provide links to more resources: List links such as detailed documentation, tutorial videos, blog posts, or any other relevant documentation to help users get the most out of your package.
+For more detailed documentation and examples, please visit the [FluentDiagrams.NET Documentation](https://github.com/Vinicius-Evangelista/FluentDiagrams.NET).
 
 ## Feedback
 
-Where and how users can leave feedback?
+We welcome your feedback and contributions! If you have any issues, suggestions, or want to report bugs, please open an issue on our [GitHub repository](https://github.com/Vinicius-Evangelista/FluentDiagrams.NET/issues).
 
-- Links to a GitHub repository where could open issues, Twitter, a Discord channel, bug tracker, or other platforms where a package consumer can connect with the package author.
+
+## Contributing
+
+We welcome contributions to FluentDiagrams.NET! If you would like to contribute, please read our [Contributing Guide](CONTRIBUTING.md) for guidelines on how to get started.
+
+## Code of Conduct
+
+Please note that this project is released with a [Contributor Code of Conduct](CODE_OF_CONDUCT.md). By participating in this project you agree to abide by its terms.
