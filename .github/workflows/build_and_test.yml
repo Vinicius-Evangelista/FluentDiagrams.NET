@@ -1,0 +1,61 @@
+name: Build and Test
+
+on:
+  push:
+    branches:
+      - main
+      - feat/**
+      - fix/**
+  pull_request:
+    branches:
+      - main
+      
+permissions:
+  security-events: write
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '9.x'
+
+      - name: Cache NuGet packages
+        uses: actions/cache@v3
+        with:
+          path: ~/.nuget/packages
+          key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj', '**/global.json') }}
+          restore-keys: |
+            ${{ runner.os }}-nuget-
+      - name: Restore dependencies
+        run: dotnet restore ./src/FluentDiagrams.NET/FluentDiagrams.NET.csproj
+
+      - name: Audit NuGet packages
+        run: dotnet list ./src/FluentDiagrams.NET/FluentDiagrams.NET.csproj package --vulnerable
+
+      - uses: microsoft/DevSkim-Action@v1
+
+      - uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: devskim-results.sarif
+
+      - name: Build
+        run: dotnet build --configuration Release --no-restore ./src/FluentDiagrams.NET/
+
+      - name: Test
+        run: dotnet test ./src/FluentDiagrams.NET/FluentDiagrams.NET.csproj --configuration Release --no-build
+
+      - name: Pack
+        run: dotnet pack ./src/FluentDiagrams.NET/FluentDiagrams.NET.csproj --configuration Release --no-build --output ./nupkgs
+
+      - name: Save package artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: nupkg
+          path: ./nupkgs/*.nupkg
