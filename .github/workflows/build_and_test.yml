@@ -23,6 +23,13 @@ jobs:
         with:
           dotnet-version: '9.x'
 
+      - name: Cache NuGet packages
+        uses: actions/cache@v3
+        with:
+          path: ~/.nuget/packages
+          key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj', '**/global.json') }}
+          restore-keys: |
+            ${{ runner.os }}-nuget-
       - name: Restore dependencies
         run: dotnet restore ./src/FluentDiagrams.NET/FluentDiagrams.NET.csproj
 
