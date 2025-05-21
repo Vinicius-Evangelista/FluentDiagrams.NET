@@ -30,7 +30,6 @@ For more detailed documentation and examples, please visit the [FluentDiagrams.N
 
 We welcome your feedback and contributions! If you have any issues, suggestions, or want to report bugs, please open an issue on our [GitHub repository](https://github.com/Vinicius-Evangelista/FluentDiagrams.NET/issues).
 
-You can also reach out to us on Twitter [@FluentDiagrams](https://twitter.com/FluentDiagrams) or join our [Discord channel](https://discord.gg/FluentDiagrams).
 
 ## Contributing
 
