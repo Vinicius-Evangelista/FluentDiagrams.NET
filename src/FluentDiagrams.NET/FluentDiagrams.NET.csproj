@@ -4,6 +4,16 @@
     <None Include="Icon\fluent-diagrams-net-icon.png" Pack="true" PackagePath="/Icon" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="AWS\Icons\" />
+    <Folder Include="LayoutEngine\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Msagl" Version="1.2.1" />
+    <PackageReference Include="SkiaSharp" Version="3.119.0" />
+  </ItemGroup>
+
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <LangVersion>13</LangVersion>
