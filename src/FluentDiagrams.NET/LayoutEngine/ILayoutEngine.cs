@@ -3,9 +3,9 @@ using Microsoft.Msagl.Core.Layout;
 
 public interface ILayoutEngine
 {
-    public Node AddNode(string nodeId);
+    public Node AddNode(IElement element);
 
-    public void AddEdge(string source, string target);
+    public void AddEdge(IElement source, IElement target);
 
     void Run();
 }

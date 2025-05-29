@@ -2,7 +2,7 @@ namespace FluentDiagrams.NET.Core;
 
 public interface IDiagram : IComposable
 {
-  public IDiagram Add(IContainer container);
+  public IDiagram AddContainer(IContainer container);
 
   public void Render();
 }
