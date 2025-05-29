@@ -11,6 +11,7 @@ public static class AwsExtensions
                              string connectTo = null!)
   {
     var element = new Ec2(id: instanceName);
+    composable.AddElement(element: element);
     Diagram.AddElement(element: element, parentId: connectTo);
     return Diagram;
   }

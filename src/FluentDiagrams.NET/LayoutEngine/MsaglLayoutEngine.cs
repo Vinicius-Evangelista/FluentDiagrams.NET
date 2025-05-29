@@ -3,8 +3,10 @@ using Microsoft.Msagl.Core.Geometry;
 using Microsoft.Msagl.Core.Geometry.Curves;
 using Microsoft.Msagl.Core.Layout;
 using Microsoft.Msagl.Core.Routing;
+using Microsoft.Msagl.Layout.Layered;
+using Microsoft.Msagl.Layout.MDS;
+using Microsoft.Msagl.Miscellaneous;
 using Microsoft.Msagl.Prototype.Ranking;
-using Microsoft.Msagl.Routing.Rectilinear;
 
 namespace FluentDiagrams.NET.LayoutEngine;
 
@@ -56,6 +58,7 @@ public class MsaglLayoutEngine : ILayoutEngine
     if (sourceNode is null)
       sourceNode = AddNode(element: source);
 
+
     if (targetNode is null)
       targetNode = AddNode(element: target);
 
@@ -74,9 +77,42 @@ public class MsaglLayoutEngine : ILayoutEngine
 
   public void Run()
   {
-    var settings = new RankingLayoutSettings()
+    var settings = new SugiyamaLayoutSettings()
     {
-      NodeSeparation = 100,
+      NodeSeparation = 20,
+      ClusterMargin = 10,
+      ClusterSettings =
+        new Dictionary<object, LayoutAlgorithmSettings>()
+        {
+          {
+            2, new RankingLayoutSettings()
+            {
+              NodeSeparation = 15, EdgeRoutingSettings =
+                new EdgeRoutingSettings
+                {
+                  EdgeSeparationRectilinear = 4.0,
+
+                  EdgeRoutingMode = EdgeRoutingMode.Rectilinear,
+                },
+                LiftCrossEdges = true,
+            }
+          },
+          {
+            1, new SugiyamaLayoutSettings()
+            {
+              NodeSeparation = 15,
+              EdgeRoutingSettings =
+                new EdgeRoutingSettings
+                {
+                  EdgeSeparationRectilinear = 4.0,
+
+                  EdgeRoutingMode = EdgeRoutingMode.Rectilinear,
+                },
+                LiftCrossEdges = true,
+            }
+          }
+        },
+
       EdgeRoutingSettings = new EdgeRoutingSettings
       {
         EdgeSeparationRectilinear = 4.0,
@@ -86,14 +122,10 @@ public class MsaglLayoutEngine : ILayoutEngine
       LiftCrossEdges = true,
     };
 
-    var rectRouter = new RectilinearEdgeRouter(graph: Graph,
-      padding: 3, cornerFitRadius: 3,
-      useSparseVisibilityGraph: true, minEdgeSeparation: 5);
+    Graph.RootCluster.SetInitialLayoutState( padding: 20);
 
-    rectRouter.Run();
-
-    var layout =
-      new RankingLayout(geometryGraph: Graph, settings: settings);
-    layout.Run();
+    Microsoft.Msagl.Miscellaneous.LayoutHelpers
+             .CalculateLayout(geometryGraph: Graph,
+                              settings: settings, cancelToken: null);
   }
 }

@@ -1,3 +1,4 @@
+using FluentDiagrams.NET.AWS;
 using FluentDiagrams.NET.LayoutEngine;
 using Microsoft.Msagl.Core.Layout;
 using Microsoft.Msagl.Core.Geometry;
@@ -9,6 +10,7 @@ namespace FluentDiagrams.NET.Core;
 public class Diagram : IDiagram
 {
   private MsaglLayoutEngine Engine { get; set; } = new();
+  private Cluster Cluster { get; set; } = new();
 
   public IComposable AddElement(IElement element,
                                 string? parentId = null!)
@@ -59,22 +61,54 @@ public class Diagram : IDiagram
     using var canvas = new SKCanvas(bitmap: bitmap);
     canvas.Clear(color: SKColors.White);
 
+    foreach (Node graphNode in
+             Engine.Graph.Nodes.Take(count: Engine.Graph.Nodes.Count /
+                                            2))
+    {
+      Cluster.AddChild(child: new
+                         Node(curve: CurveFactory.CreateRectangle(width: 100, height: 60, center: new Point(xCoordinate: 0, yCoordinate: 0)),
+                              userData: new Ec2(id: "instance-x")));
+    }
+
+
+    Cluster.UserData = 1;
+    Engine.Graph.RootCluster.AddChild(child: Cluster);
+
+    Engine.Graph.RootCluster.UserData = 1;
+
     Engine.Run();
 
     Rectangle bbox = Engine.Graph.BoundingBox;
 
-    float canvasWidth = bitmap.Width;
-    float canvasHeight = bitmap.Height;
+    foreach (Node? node in
+             Engine.Graph.RootCluster.Clusters
+                   .Select(selector: x => x.Nodes).SelectMany(selector: x => x))
+    {
+      double x = node.Center.X;
+      double y = node.Center.Y;
 
-    var graphWidth = (float)bbox.Width;
-    var graphHeight = (float)bbox.Height;
+      var paint = new SkiaSharp.SKPaint
+      {
+        Color = SkiaSharp.SKColors.Blue,
+        IsAntialias = true
+      };
 
-    float translateX =
-      (canvasWidth - graphWidth) / 2f - (float)bbox.Left;
-    float translateY =
-      (canvasHeight - graphHeight) / 2f - (float)bbox.Top;
+      canvas.DrawCircle(cx: (float)x, cy: (float)y, radius: 10,
+                        paint: paint);
 
-    canvas.Translate(dx: translateX, dy: translateY);
+      var textPaint = new SkiaSharp.SKPaint
+      {
+        Color = SkiaSharp.SKColors.Black,
+        TextSize = 16
+      };
+
+      canvas.DrawText(
+                      text: ((IElement)node.UserData).Id ?? "",
+                      x: (float)x + 12,
+                      y: (float)y + 5,
+                      paint: textPaint
+                     );
+    }
 
     foreach (Node node in Engine.Graph.Nodes)
     {
@@ -106,35 +140,6 @@ public class Diagram : IDiagram
 
     foreach (Edge? edge in Engine.Graph.Edges)
     {
-      ICurve? edgeCurve = edge.EdgeGeometry.Curve;
-      if (edgeCurve == null)
-        continue;
-
-
-      var path = new SKPath();
-      path.MoveTo(x: (float)edgeCurve.Start.X, y: (float)edgeCurve.Start.Y);
-
-
-        switch (edgeCurve)
-        {
-          case Microsoft.Msagl.Core.Geometry.Curves.LineSegment line:
-            path.LineTo(x: (float)line.End.X, y: (float)line.End.Y);
-            break;
-
-          case Microsoft.Msagl.Core.Geometry.Curves.CubicBezierSegment bezier:
-            path.CubicTo(
-                         x0: (float)bezier[t: 1].X, y0: (float)bezier[t: 1].Y,  // First control point
-                         x1: (float)bezier[t: 2].X, y1: (float)bezier[t: 2].Y,  // Second control point
-                         x2: (float)bezier[t: 3].X, y2: (float)bezier[t: 3].Y
-                        );
-            break;
-
-          case Microsoft.Msagl.Core.Geometry.Curves.Polyline polyline:
-            for (var i = 1; i < polyline.Count(); i++)
-              path.LineTo(x: (float)polyline[t: i].X, y: (float)polyline[t: i].Y);
-            break;
-        }
-
       var edgePaint = new SKPaint
       {
         Color = SKColors.Black,
@@ -143,7 +148,28 @@ public class Diagram : IDiagram
         Style = SKPaintStyle.Stroke
       };
 
-      canvas.DrawPath(path: path, paint: edgePaint);
+      ICurve? edgeCurve = edge.EdgeGeometry.Curve;
+
+      if (edgeCurve != null)
+      {
+        var path = new SKPath();
+
+        var steps = 1000;
+        double tStep = 1.0 / steps;
+        Point start = edgeCurve.Start;
+        path.MoveTo(x: (float)start.X, y: (float)start.Y);
+
+        for (var i = 1; i <= steps; i++)
+        {
+          double t = i * tStep;
+          Point point =
+            edgeCurve
+              [t: edgeCurve.ParStart + t * (edgeCurve.ParEnd - edgeCurve.ParStart)];
+          path.LineTo(x: (float)point.X, y: (float)point.Y);
+        }
+
+        canvas.DrawPath(path: path, paint: edgePaint);
+      }
     }
 
     using SKImage? image =
