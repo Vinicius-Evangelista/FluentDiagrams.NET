@@ -6,17 +6,16 @@ public static class AwsExtensions
 {
   private static Diagram Diagram { get; set; } = new();
 
-  public static IDiagram Ec2(this IComposable composable,
+  public static IComposable Ec2(this IComposable composable,
                              string instanceName,
                              string connectTo = null!)
   {
     var element = new Ec2(id: instanceName);
-    composable.AddElement(element: element);
-    Diagram.AddElement(element: element, parentId: connectTo);
-    return Diagram;
+    composable.AddElement(element: element, parentId: connectTo);
+    return composable;
   }
 
-  public static IDiagram Vpc(this IDiagram diagram,
+  public static IDiagram Vpc(this IComposable composable,
                              string vpcName,
                              Action<Vpc> config)
   {
@@ -25,4 +24,7 @@ public static class AwsExtensions
     Diagram.AddContainer(container: vpc);
     return Diagram;
   }
+
+  public static IDiagram Render(this IComposable diagram) =>
+    Diagram;
 }

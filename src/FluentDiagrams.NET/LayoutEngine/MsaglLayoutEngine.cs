@@ -39,6 +39,36 @@ public class MsaglLayoutEngine : ILayoutEngine
     return node;
   }
 
+  public void AddCluster(IContainer container)
+  {
+    if (container is null)
+      throw new ArgumentNullException(paramName: nameof(container));
+
+    if (string.IsNullOrEmpty(value: container.Id))
+    {
+      throw new
+        ArgumentNullException(paramName: nameof(container.Id));
+    }
+
+    var cluster = new Cluster();
+
+    foreach (IElement element in container.Elements)
+    {
+      cluster.AddChild(child: new
+                         Node(curve: CurveFactory.CreateRectangle(
+                               width: 30,
+                               height: 20,
+                               center: new Point(xCoordinate: 0,
+                                 yCoordinate: 0)),
+                              userData: element));
+    }
+
+    cluster.UserData = container.Id;
+
+    Graph.RootCluster.AddChild(child: cluster);
+  }
+
+
   public void AddEdge(IElement source, IElement target)
   {
     if (string.IsNullOrEmpty(value: source.ImagePath) ||
@@ -79,28 +109,14 @@ public class MsaglLayoutEngine : ILayoutEngine
   {
     var settings = new SugiyamaLayoutSettings()
     {
-      NodeSeparation = 20,
-      ClusterMargin = 10,
       ClusterSettings =
         new Dictionary<object, LayoutAlgorithmSettings>()
         {
           {
-            2, new RankingLayoutSettings()
-            {
-              NodeSeparation = 15, EdgeRoutingSettings =
-                new EdgeRoutingSettings
-                {
-                  EdgeSeparationRectilinear = 4.0,
-
-                  EdgeRoutingMode = EdgeRoutingMode.Rectilinear,
-                },
-                LiftCrossEdges = true,
-            }
-          },
-          {
             1, new SugiyamaLayoutSettings()
             {
-              NodeSeparation = 15,
+              ClusterMargin = 70,
+              NodeSeparation = 50,
               EdgeRoutingSettings =
                 new EdgeRoutingSettings
                 {
@@ -108,21 +124,35 @@ public class MsaglLayoutEngine : ILayoutEngine
 
                   EdgeRoutingMode = EdgeRoutingMode.Rectilinear,
                 },
-                LiftCrossEdges = true,
             }
           }
         },
-
-      EdgeRoutingSettings = new EdgeRoutingSettings
-      {
-        EdgeSeparationRectilinear = 4.0,
-
-        EdgeRoutingMode = EdgeRoutingMode.Rectilinear,
-      },
-      LiftCrossEdges = true,
     };
 
-    Graph.RootCluster.SetInitialLayoutState( padding: 20);
+    foreach (Cluster? cluster in Graph.RootCluster.Clusters)
+    {
+      if (!settings.ClusterSettings
+                   .ContainsKey(key: cluster.UserData))
+      {
+        settings.ClusterSettings.Add(
+                                     key: cluster.UserData!,
+                                     value: new MdsLayoutSettings()
+                                       {
+                                         NodeSeparation = 50,
+                                         EdgeRoutingSettings =
+                                           new EdgeRoutingSettings
+                                           {
+                                             EdgeRoutingMode =
+                                               EdgeRoutingMode
+                                                 .Rectilinear,
+                                           },
+                                       });
+      }
+    }
+
+
+    Graph.MinimalWidth = 2000;
+    Graph.MinimalHeight = 1000;
 
     Microsoft.Msagl.Miscellaneous.LayoutHelpers
              .CalculateLayout(geometryGraph: Graph,

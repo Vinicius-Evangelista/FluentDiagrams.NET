@@ -1,3 +1,5 @@
+using Microsoft.Msagl.Core.Layout;
+
 namespace FluentDiagrams.NET.Core;
 
 public interface IComposable

@@ -1,4 +1,5 @@
 using FluentDiagrams.NET.Core;
+using Microsoft.Msagl.Core.Layout;
 
 namespace FluentDiagrams.NET.AWS;
 

@@ -9,8 +9,8 @@ namespace FluentDiagrams.NET.Core;
 
 public class Diagram : IDiagram
 {
+  public Cluster Cluster = new();
   private MsaglLayoutEngine Engine { get; set; } = new();
-  private Cluster Cluster { get; set; } = new();
 
   public IComposable AddElement(IElement element,
                                 string? parentId = null!)
@@ -47,10 +47,7 @@ public class Diagram : IDiagram
     if (container is null)
       throw new ArgumentNullException(paramName: nameof(container));
 
-    AddElement(element: container);
-
-    foreach (IElement element in container.Elements)
-      AddElement(element: element, parentId: container.Id);
+    Engine.AddCluster(container: container);
 
     return this;
   }
@@ -61,20 +58,22 @@ public class Diagram : IDiagram
     using var canvas = new SKCanvas(bitmap: bitmap);
     canvas.Clear(color: SKColors.White);
 
+
+    Engine.Graph.RootCluster.UserData = 1;
+
     foreach (Node graphNode in
              Engine.Graph.Nodes.Take(count: Engine.Graph.Nodes.Count /
                                             2))
     {
       Cluster.AddChild(child: new
-                         Node(curve: CurveFactory.CreateRectangle(width: 100, height: 60, center: new Point(xCoordinate: 0, yCoordinate: 0)),
+                         Node(curve: CurveFactory.CreateRectangle(width: 50, height: 60, center: new Point(xCoordinate: 0, yCoordinate: 0)),
                               userData: new Ec2(id: "instance-x")));
     }
 
 
-    Cluster.UserData = 1;
+    Cluster.UserData = 2;
     Engine.Graph.RootCluster.AddChild(child: Cluster);
 
-    Engine.Graph.RootCluster.UserData = 1;
 
     Engine.Run();
 
@@ -82,7 +81,8 @@ public class Diagram : IDiagram
 
     foreach (Node? node in
              Engine.Graph.RootCluster.Clusters
-                   .Select(selector: x => x.Nodes).SelectMany(selector: x => x))
+                   .Select(selector: x => x.Nodes)
+                   .SelectMany(selector: x => x))
     {
       double x = node.Center.X;
       double y = node.Center.Y;
@@ -143,7 +143,7 @@ public class Diagram : IDiagram
       var edgePaint = new SKPaint
       {
         Color = SKColors.Black,
-        StrokeWidth = 2,
+        StrokeWidth = 1,
         IsAntialias = true,
         Style = SKPaintStyle.Stroke
       };
@@ -159,7 +159,7 @@ public class Diagram : IDiagram
         Point start = edgeCurve.Start;
         path.MoveTo(x: (float)start.X, y: (float)start.Y);
 
-        for (var i = 1; i <= steps; i++)
+        for (var i = 0; i <= steps; i++)
         {
           double t = i * tStep;
           Point point =
