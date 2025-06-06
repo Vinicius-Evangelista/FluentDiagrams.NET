@@ -10,25 +10,24 @@ namespace FluentDiagrams.NET.Core;
 public class Diagram : IDiagram
 {
   public Cluster Cluster = new();
-  private MsaglLayoutEngine Engine { get; set; } = new();
+  private static MsaglLayoutEngine Engine { get; set; } = new();
 
-  public IComposable AddElement(IElement element,
-                                string? parentId = null!)
+  public IComposable AddElement(IElement element)
   {
     if (element is null)
       throw new ArgumentNullException(paramName: nameof(element));
 
-    if (parentId is not null)
+    if (!string.IsNullOrEmpty(value: element.ConnectTo) )
     {
       // TODO: Add personalized exception for not found parent
 
-      IElement parent = GetElementById(id: parentId) ??
+      IElement parent = GetElementById(id: element.ConnectTo) ??
                         throw new InvalidOperationException();
 
       Engine.AddEdge(source: element, target: parent);
     }
 
-    if (parentId is null)
+    if (string.IsNullOrEmpty(value: element.ConnectTo))
       Engine.AddNode(element: element);
 
     return this;
@@ -59,30 +58,30 @@ public class Diagram : IDiagram
     canvas.Clear(color: SKColors.White);
 
 
-    Engine.Graph.RootCluster.UserData = 1;
+    MsaglLayoutEngine.Graph.RootCluster.UserData = 1;
 
     foreach (Node graphNode in
-             Engine.Graph.Nodes.Take(count: Engine.Graph.Nodes.Count /
-                                            2))
+             MsaglLayoutEngine.Graph.Nodes.Take(count: MsaglLayoutEngine.Graph.Nodes.Count /
+                                        2))
     {
       Cluster.AddChild(child: new
                          Node(curve: CurveFactory.CreateRectangle(width: 50, height: 60, center: new Point(xCoordinate: 0, yCoordinate: 0)),
-                              userData: new Ec2(id: "instance-x")));
+                              userData: new Ec2(id: "instance-x", connectTo: "ec2-12")));
     }
 
 
     Cluster.UserData = 2;
-    Engine.Graph.RootCluster.AddChild(child: Cluster);
+    MsaglLayoutEngine.Graph.RootCluster.AddChild(child: Cluster);
 
 
     Engine.Run();
 
-    Rectangle bbox = Engine.Graph.BoundingBox;
+    Rectangle bbox = MsaglLayoutEngine.Graph.BoundingBox;
 
     foreach (Node? node in
-             Engine.Graph.RootCluster.Clusters
-                   .Select(selector: x => x.Nodes)
-                   .SelectMany(selector: x => x))
+             MsaglLayoutEngine.Graph.RootCluster.Clusters
+               .Select(selector: x => x.Nodes)
+               .SelectMany(selector: x => x))
     {
       double x = node.Center.X;
       double y = node.Center.Y;
@@ -110,7 +109,7 @@ public class Diagram : IDiagram
                      );
     }
 
-    foreach (Node node in Engine.Graph.Nodes)
+    foreach (Node node in MsaglLayoutEngine.Graph.Nodes)
     {
       double x = node.Center.X;
       double y = node.Center.Y;
@@ -138,7 +137,7 @@ public class Diagram : IDiagram
                      );
     }
 
-    foreach (Edge? edge in Engine.Graph.Edges)
+    foreach (Edge? edge in MsaglLayoutEngine.Graph.Edges)
     {
       var edgePaint = new SKPaint
       {
@@ -154,7 +153,7 @@ public class Diagram : IDiagram
       {
         var path = new SKPath();
 
-        var steps = 1000;
+        var steps = 999;
         double tStep = 1.0 / steps;
         Point start = edgeCurve.Start;
         path.MoveTo(x: (float)start.X, y: (float)start.Y);

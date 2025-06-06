@@ -7,5 +7,5 @@ public interface IElement
 {
   public string Id { get; }
   public string ImagePath { get; }
-
+  public string ConnectTo { get; set; }
 }

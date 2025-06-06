@@ -10,8 +10,8 @@ public static class AwsExtensions
                              string instanceName,
                              string connectTo = null!)
   {
-    var element = new Ec2(id: instanceName);
-    composable.AddElement(element: element, parentId: connectTo);
+    var element = new Ec2(id: instanceName, connectTo: connectTo);
+    composable.AddElement(element: element);
     return composable;
   }
 

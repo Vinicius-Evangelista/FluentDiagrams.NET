@@ -7,7 +7,7 @@ public class Vpc(string id) : IContainer
 {
   public List<IElement> Elements { get; private set; } = [];
 
-  public IComposable AddElement(IElement element, string? parentId = null!)
+  public IComposable AddElement(IElement element)
   {
     Elements.Add(item: element);
     return this;
@@ -15,4 +15,5 @@ public class Vpc(string id) : IContainer
 
   public string Id { get; } = id;
   public string ImagePath { get; } = "aws/Vpc.png";
+  public string ConnectTo { get; set; } = null!;
 }
