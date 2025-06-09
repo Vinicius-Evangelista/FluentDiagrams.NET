@@ -9,8 +9,18 @@ namespace FluentDiagrams.NET.Core;
 
 public class Diagram : IDiagram
 {
-  public Cluster Cluster = new();
-  private static MsaglLayoutEngine Engine { get; set; } = new();
+  private MsaglLayoutEngine Engine { get; set; } = new();
+  private DiagramSettings Settings { get; set; } = new();
+
+  public IDiagram SetSettings(DiagramSettings settings)
+  {
+    if (settings is null)
+      throw new ArgumentNullException(paramName: nameof(settings));
+
+    Settings = settings;
+
+    return this;
+  }
 
   public IComposable AddElement(IElement element)
   {
@@ -20,7 +30,6 @@ public class Diagram : IDiagram
     if (!string.IsNullOrEmpty(value: element.ConnectTo) )
     {
       // TODO: Add personalized exception for not found parent
-
       IElement parent = GetElementById(id: element.ConnectTo) ??
                         throw new InvalidOperationException();
 
@@ -57,26 +66,9 @@ public class Diagram : IDiagram
     using var canvas = new SKCanvas(bitmap: bitmap);
     canvas.Clear(color: SKColors.White);
 
-
     MsaglLayoutEngine.Graph.RootCluster.UserData = 1;
 
-    foreach (Node graphNode in
-             MsaglLayoutEngine.Graph.Nodes.Take(count: MsaglLayoutEngine.Graph.Nodes.Count /
-                                        2))
-    {
-      Cluster.AddChild(child: new
-                         Node(curve: CurveFactory.CreateRectangle(width: 50, height: 60, center: new Point(xCoordinate: 0, yCoordinate: 0)),
-                              userData: new Ec2(id: "instance-x", connectTo: "ec2-12")));
-    }
-
-
-    Cluster.UserData = 2;
-    MsaglLayoutEngine.Graph.RootCluster.AddChild(child: Cluster);
-
-
     Engine.Run();
-
-    Rectangle bbox = MsaglLayoutEngine.Graph.BoundingBox;
 
     foreach (Node? node in
              MsaglLayoutEngine.Graph.RootCluster.Clusters
@@ -86,25 +78,25 @@ public class Diagram : IDiagram
       double x = node.Center.X;
       double y = node.Center.Y;
 
-      var paint = new SkiaSharp.SKPaint
+      var paint = new SKPaint
       {
-        Color = SkiaSharp.SKColors.Blue,
+        Color = SKColors.Blue,
         IsAntialias = true
       };
 
       canvas.DrawCircle(cx: (float)x, cy: (float)y, radius: 10,
                         paint: paint);
 
-      var textPaint = new SkiaSharp.SKPaint
+      var textPaint = new SKPaint
       {
-        Color = SkiaSharp.SKColors.Black,
+        Color = SKColors.Black,
         TextSize = 16
       };
 
       canvas.DrawText(
                       text: ((IElement)node.UserData).Id ?? "",
-                      x: (float)x + 12,
-                      y: (float)y + 5,
+                      x: (float)x - 20,
+                      y: (float)y + 30,
                       paint: textPaint
                      );
     }
@@ -174,8 +166,8 @@ public class Diagram : IDiagram
     using SKImage? image =
       SkiaSharp.SKImage.FromBitmap(bitmap: bitmap);
     using SKData? data =
-      image.Encode(format: SkiaSharp.SKEncodedImageFormat.Png,
-                   quality: 100);
+      image.Encode(format: SkiaSharp.SKEncodedImageFormat.Jpeg,
+                   quality: 1000);
     using FileStream stream =
       File.OpenWrite(path: "C:\\Users\\vinie\\diagramaa.png");
     data.SaveTo(target: stream);
