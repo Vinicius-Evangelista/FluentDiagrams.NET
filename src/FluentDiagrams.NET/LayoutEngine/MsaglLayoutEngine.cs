@@ -4,6 +4,7 @@ using Microsoft.Msagl.Core.Geometry.Curves;
 using Microsoft.Msagl.Core.Layout;
 using Microsoft.Msagl.Core.Routing;
 using Microsoft.Msagl.Layout.Layered;
+using Microsoft.Msagl.Miscellaneous;
 
 namespace FluentDiagrams.NET.LayoutEngine;
 
@@ -11,30 +12,33 @@ public class MsaglLayoutEngine
 {
   public static GeometryGraph Graph { get; private set; } = new();
 
+  static MsaglLayoutEngine() =>
+    Graph.RootCluster.UserData = 1;
+
   public Node AddNode(IElement element)
-     {
-       Node? existingNode =
-         Graph.Nodes.FirstOrDefault(predicate: x =>
-                                      ((IElement)x.UserData).Id ==
-                                      element.Id);
+  {
+    Node? existingNode =
+      Graph.Nodes.FirstOrDefault(predicate: x =>
+                                   ((IElement)x.UserData).Id ==
+                                   element.Id);
 
-       if (existingNode is not null)
-         return existingNode;
+    if (existingNode is not null)
+      return existingNode;
 
-       if (string.IsNullOrEmpty(value: element.Id))
-         throw new ArgumentNullException(paramName: nameof(element.Id));
+    if (string.IsNullOrEmpty(value: element.Id))
+      throw new ArgumentNullException(paramName: nameof(element.Id));
 
-       var node = new
-         Node(curve: CurveFactory.CreateRectangle(
-                 width: 30,
-                 height: 20,
-                 center: new Point(xCoordinate: 0,
-                                   yCoordinate: 0)), userData: element);
+    var node = new
+      Node(curve: CurveFactory.CreateRectangle(
+              width: 30,
+              height: 20,
+              center: new Point(xCoordinate: 0,
+                                yCoordinate: 0)), userData: element);
 
-       Graph.Nodes.Add(item: node);
+    Graph.Nodes.Add(item: node);
 
-       return node;
-     }
+    return node;
+  }
 
   public void AddCluster(IContainer container)
   {
@@ -49,19 +53,16 @@ public class MsaglLayoutEngine
 
     var cluster = new Cluster();
 
-    foreach (IElement element in container.Elements)
-    {
-      var node =
-        new
-          Node(curve: CurveFactory.CreateRectangle(
-                  width: 29,
-                  height: 19,
-                  center: new Point(xCoordinate: 0,
-                                    yCoordinate: 0)),
-               userData: element);
+    foreach (Node? node in container.Elements.Select(selector:
+                  element => new
+                    Node(curve: CurveFactory.CreateRectangle(
+                            width: 29,
+                            height: 19,
+                            center: new Point(xCoordinate: 0,
+                                                yCoordinate: 0)),
+                         userData: element)))
 
       cluster.AddChild(child: node);
-    }
 
     cluster.UserData = container.Id;
 
@@ -69,28 +70,24 @@ public class MsaglLayoutEngine
 
     foreach (IElement element in container.Elements)
     {
-      if (!string.IsNullOrEmpty(value: element.ConnectTo))
-      {
-        Node? source = cluster.Nodes.FirstOrDefault(predicate: x =>
-               ((IElement)x.UserData).Id ==
-               element.Id);
+      if (string.IsNullOrEmpty(value: element.ConnectTo))
+        continue;
 
-        Node? target = Graph.Nodes.FirstOrDefault(predicate: x =>
-               ((IElement)x.UserData).Id ==
-               element.ConnectTo);
+      Node? source = cluster.Nodes.FirstOrDefault(predicate: x =>
+             ((IElement)x.UserData).Id ==
+             element.Id);
 
-        if (target is null)
-        {
-          target = cluster.Nodes.FirstOrDefault(predicate: x =>
-                 ((IElement)x.UserData).Id ==
-                 element.ConnectTo);
-        }
+      Node? target = Graph.Nodes.FirstOrDefault(predicate: x =>
+                            ((IElement)x.UserData).Id ==
+                            element.ConnectTo) ??
+                     cluster.Nodes.FirstOrDefault(predicate: x =>
+                            ((IElement)x.UserData).Id ==
+                            element.ConnectTo);
 
-        var edge = new Edge(source: source,
-                            target: target);
+      var edge = new Edge(source: source,
+                          target: target);
 
-         Graph.Edges.Add(item: edge);
-      }
+      Graph.Edges.Add(item: edge);
     }
   }
 
@@ -111,12 +108,8 @@ public class MsaglLayoutEngine
                                    ((IElement)x.UserData).Id ==
                                    target.Id);
 
-    if (sourceNode is null)
-      sourceNode = AddNode(element: source);
-
-
-    if (targetNode is null)
-      targetNode = AddNode(element: target);
+    sourceNode ??= AddNode(element: source);
+    targetNode ??= AddNode(element: target);
 
     Graph.Edges.Add(item: new Edge(source: targetNode,
                                    target: sourceNode));
@@ -131,18 +124,18 @@ public class MsaglLayoutEngine
     return node?.UserData as IElement;
   }
 
-  public void Run()
+  public static void Run(DiagramSettings diagramSettings)
   {
     var settings = new SugiyamaLayoutSettings()
     {
       ClusterMargin = 40,
+      LabelCornersPreserveCoefficient = 20d,
       ClusterSettings =
         new Dictionary<object, LayoutAlgorithmSettings>()
         {
           {
             1, new SugiyamaLayoutSettings()
             {
-
               ClusterMargin = 20,
               NodeSeparation = 10,
               EdgeRoutingSettings =
@@ -154,7 +147,6 @@ public class MsaglLayoutEngine
             }
           }
         },
-
     };
 
     foreach (Cluster? cluster in Graph.RootCluster.Clusters)
@@ -164,27 +156,28 @@ public class MsaglLayoutEngine
       {
         settings.ClusterSettings.Add(
                                      key: cluster.UserData!,
-                                     value: new SugiyamaLayoutSettings()
-                                     {
-                                       NodeSeparation = 10,
-                                       ClusterMargin = 10,
-                                       EdgeRoutingSettings =
-                                         new EdgeRoutingSettings
-                                         {
-                                           EdgeRoutingMode =
-                                             EdgeRoutingMode
-                                               .Rectilinear,
-                                         },
-                                     });
+                                     value: new
+                                       SugiyamaLayoutSettings()
+                                       {
+                                         NodeSeparation = 10,
+                                         ClusterMargin = 10,
+                                         EdgeRoutingSettings =
+                                           new EdgeRoutingSettings
+                                           {
+                                             EdgeRoutingMode =
+                                               EdgeRoutingMode
+                                                 .Rectilinear,
+                                           },
+                                       });
       }
     }
 
-    Graph.MinimalHeight = 1000;
-    Graph.MinimalWidth = 2000;
-    Graph.Margins = 50;
+    Graph.MinimalHeight = diagramSettings.Height;
+    Graph.MinimalWidth = diagramSettings.Width;
+    Graph.Margins = diagramSettings.ElementMargin;
 
-    Microsoft.Msagl.Miscellaneous.LayoutHelpers
-             .CalculateLayout(geometryGraph: Graph,
-                              settings: settings, cancelToken: null);
+    LayoutHelpers
+      .CalculateLayout(geometryGraph: Graph,
+                       settings: settings, cancelToken: null);
   }
 }

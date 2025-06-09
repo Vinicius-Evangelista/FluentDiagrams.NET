@@ -5,9 +5,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="AWS\Icons\" />
     <Folder Include="LayoutEngine\" />
-    <Folder Include="Rendering\" />
+    <Folder Include="RenderingEngine\" />
   </ItemGroup>
 
   <ItemGroup>
