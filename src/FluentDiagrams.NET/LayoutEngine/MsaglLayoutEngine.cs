@@ -32,8 +32,8 @@ public class MsaglLayoutEngine
       Node(curve: CurveFactory.CreateRectangle(
               width: 30,
               height: 20,
-              center: new Point(xCoordinate: 0,
-                                yCoordinate: 0)), userData: element);
+            center: new Point(xCoordinate: 0,
+                              yCoordinate: 0)), userData: element);
 
     Graph.Nodes.Add(item: node);
 
@@ -74,15 +74,15 @@ public class MsaglLayoutEngine
         continue;
 
       Node? source = cluster.Nodes.FirstOrDefault(predicate: x =>
-             ((IElement)x.UserData).Id ==
-             element.Id);
+        ((IElement)x.UserData).Id ==
+        element.Id);
 
       Node? target = Graph.Nodes.FirstOrDefault(predicate: x =>
-                            ((IElement)x.UserData).Id ==
-                            element.ConnectTo) ??
+                       ((IElement)x.UserData).Id ==
+                       element.ConnectTo) ??
                      cluster.Nodes.FirstOrDefault(predicate: x =>
-                            ((IElement)x.UserData).Id ==
-                            element.ConnectTo);
+                       ((IElement)x.UserData).Id ==
+                       element.ConnectTo);
 
       var edge = new Edge(source: source,
                           target: target);
@@ -146,7 +146,6 @@ public class MsaglLayoutEngine
               EdgeRoutingSettings =
                 new EdgeRoutingSettings
                 {
-                  EdgeSeparationRectilinear = 4.0,
                   EdgeRoutingMode = EdgeRoutingMode.Rectilinear,
                 },
             }
@@ -176,9 +175,15 @@ public class MsaglLayoutEngine
       }
     }
 
+
+    Graph.RootCluster.BoundingBox = Graph.RootCluster.BoundingBox with
+    {
+      Center = new Point(xCoordinate: Graph.BoundingBox.Center.X,
+                         yCoordinate: Graph.BoundingBox.Center.Y),
+    };
+
     Graph.MinimalHeight = diagramSettings.Height;
     Graph.MinimalWidth = diagramSettings.Width;
-    Graph.Margins = diagramSettings.ElementMargin;
 
     LayoutHelpers
       .CalculateLayout(geometryGraph: Graph,
