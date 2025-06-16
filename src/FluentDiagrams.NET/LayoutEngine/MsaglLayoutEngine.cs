@@ -54,13 +54,13 @@ public class MsaglLayoutEngine
     var cluster = new Cluster();
 
     foreach (Node? node in container.Elements.Select(selector:
-                  element => new
-                    Node(curve: CurveFactory.CreateRectangle(
-                            width: 29,
-                            height: 19,
-                            center: new Point(xCoordinate: 0,
-                                                yCoordinate: 0)),
-                         userData: element)))
+               element => new
+                 Node(curve: CurveFactory.CreateRectangle(
+                       width: 55,
+                       height: 55,
+                       center: new Point(xCoordinate: 0,
+                                         yCoordinate: 0)),
+                      userData: element)))
 
       cluster.AddChild(child: node);
 
@@ -128,16 +128,21 @@ public class MsaglLayoutEngine
   {
     var settings = new SugiyamaLayoutSettings()
     {
-      ClusterMargin = 40,
-      LabelCornersPreserveCoefficient = 20d,
+      EdgeRoutingSettings = new EdgeRoutingSettings
+      {
+        EdgeSeparationRectilinear = 10.0,
+        EdgeRoutingMode = EdgeRoutingMode.RectilinearToCenter,
+      },
+
       ClusterSettings =
         new Dictionary<object, LayoutAlgorithmSettings>()
         {
           {
             1, new SugiyamaLayoutSettings()
             {
-              ClusterMargin = 20,
-              NodeSeparation = 10,
+              ClusterMargin = 30,
+              NodeSeparation = 20,
+              LayerSeparation = 40,
               EdgeRoutingSettings =
                 new EdgeRoutingSettings
                 {
@@ -159,16 +164,15 @@ public class MsaglLayoutEngine
                                      value: new
                                        SugiyamaLayoutSettings()
                                        {
-                                         NodeSeparation = 10,
-                                         ClusterMargin = 10,
+                                         NodeSeparation = 25,
+                                         ClusterMargin = 35,
+                                         LayerSeparation = 45,
                                          EdgeRoutingSettings =
                                            new EdgeRoutingSettings
                                            {
-                                             EdgeRoutingMode =
-                                               EdgeRoutingMode
-                                                 .Rectilinear,
-                                           },
-                                       });
+                                             EdgeRoutingMode = EdgeRoutingMode.Rectilinear,
+                                           }
+                                        });
       }
     }
 
