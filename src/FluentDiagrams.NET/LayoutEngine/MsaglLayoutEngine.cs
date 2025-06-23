@@ -65,7 +65,7 @@ public class MsaglLayoutEngine
 
       cluster.AddChild(child: node);
 
-    cluster.UserData = container.Id;
+    cluster.UserData = container;
 
     Graph.RootCluster.AddChild(child: cluster);
 
@@ -159,13 +159,13 @@ public class MsaglLayoutEngine
         },
     };
 
-    foreach (Cluster? cluster in Graph.RootCluster.Clusters)
+    foreach (IElement? containers in Graph.RootCluster.Clusters.Select(selector: x => x.UserData as IElement))
     {
       if (!settings.ClusterSettings
-                   .ContainsKey(key: cluster.UserData))
+                   .ContainsKey(key: containers.Id))
       {
         settings.ClusterSettings.Add(
-                                     key: cluster.UserData!,
+                                     key: containers.Id,
                                      value: new
                                        SugiyamaLayoutSettings()
                                        {

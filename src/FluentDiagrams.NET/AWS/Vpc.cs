@@ -14,6 +14,6 @@ public class Vpc(string id) : IContainer
   }
 
   public string Id { get; } = id;
-  public string ImagePath { get; } = "aws/Vpc.png";
+  public string ImagePath { get; } = "C:\\Users\\vinie\\RiderProjects\\FluentDiagrams.NET\\src\\FluentDiagrams.NET\\AWS\\Icons\\Architecture-Service-Icons_02072025\\Arch_Networking-Content-Delivery\\48\\Arch_Amazon-Virtual-Private-Cloud_48.png";
   public string ConnectTo { get; set; } = null!;
 }

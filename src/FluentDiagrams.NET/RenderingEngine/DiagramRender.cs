@@ -72,10 +72,14 @@ public static class DiagramRender
       return;
 
     SKPath path = new();
+
     const int steps = 999;
     const double tStep = 1.0 / steps;
+
     Point start = edgeCurve.Start;
+
     path.MoveTo(x: (float)start.X, y: (float)start.Y);
+
     for (var i = 0; i <= steps; i++)
     {
       double t = i * tStep;
@@ -157,6 +161,7 @@ public static class DiagramRender
     clusterPaint.StrokeWidth = 2;
     clusterPaint.IsAntialias = true;
     clusterPaint.Style = SKPaintStyle.Stroke;
+
     clusterPaint.PathEffect =
       SKPathEffect.CreateDash(intervals: new float[] { 8, 6 },
                               phase: 0);
@@ -177,10 +182,14 @@ public static class DiagramRender
     DiagramSettings settings)
   {
     Rectangle currentBox = graph.RootCluster.BoundingBox;
+
     double boxWidth = currentBox.Right - currentBox.Left;
     double boxHeight = currentBox.Top - currentBox.Bottom;
+
     double centerX = settings.Width / 2;
     double centerY = settings.Height / 2;
+
+
     var newBoundingBox = new Rectangle(
                                        x0: centerX - boxWidth / 2,
                                        y0: centerY - boxHeight / 2,
@@ -211,6 +220,7 @@ public static class DiagramRender
                               right: (float)newBoundingBox.Right,
                               bottom: (float)newBoundingBox.Top
                              );
+
 
     canvas.DrawRect(rect: rootRect, paint: rootClusterPaint);
   }
