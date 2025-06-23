@@ -30,10 +30,11 @@ public class MsaglLayoutEngine
 
     var node = new
       Node(curve: CurveFactory.CreateRectangle(
-              width: 30,
-              height: 20,
+            width: 68,
+            height: 68,
             center: new Point(xCoordinate: 0,
                               yCoordinate: 0)), userData: element);
+
 
     Graph.Nodes.Add(item: node);
 
@@ -56,8 +57,8 @@ public class MsaglLayoutEngine
     foreach (Node? node in container.Elements.Select(selector:
                element => new
                  Node(curve: CurveFactory.CreateRectangle(
-                       width: 55,
-                       height: 55,
+                       width: 68,
+                       height: 68,
                        center: new Point(xCoordinate: 0,
                                          yCoordinate: 0)),
                       userData: element)))
@@ -111,6 +112,7 @@ public class MsaglLayoutEngine
     sourceNode ??= AddNode(element: source);
     targetNode ??= AddNode(element: target);
 
+
     Graph.Edges.Add(item: new Edge(source: targetNode,
                                    target: sourceNode));
   }
@@ -132,21 +134,25 @@ public class MsaglLayoutEngine
       {
         EdgeSeparationRectilinear = 10.0,
         EdgeRoutingMode = EdgeRoutingMode.RectilinearToCenter,
+        RouteMultiEdgesAsBundles = true,
       },
-
       ClusterSettings =
         new Dictionary<object, LayoutAlgorithmSettings>()
         {
           {
             1, new SugiyamaLayoutSettings()
             {
+              Transformation =
+                PlaneTransformation.Rotation(angle: Math.PI / 2),
               ClusterMargin = 30,
-              NodeSeparation = 20,
+              NodeSeparation = 40,
               LayerSeparation = 40,
               EdgeRoutingSettings =
                 new EdgeRoutingSettings
                 {
-                  EdgeRoutingMode = EdgeRoutingMode.Rectilinear,
+                  EdgeRoutingMode = EdgeRoutingMode.RectilinearToCenter,
+                  RouteMultiEdgesAsBundles = true,
+
                 },
             }
           }
@@ -163,24 +169,24 @@ public class MsaglLayoutEngine
                                      value: new
                                        SugiyamaLayoutSettings()
                                        {
+                                         Transformation =
+                                           PlaneTransformation
+                                             .Rotation(angle:
+                                               - Math.PI / 2),
                                          NodeSeparation = 25,
                                          ClusterMargin = 35,
                                          LayerSeparation = 45,
                                          EdgeRoutingSettings =
                                            new EdgeRoutingSettings
                                            {
-                                             EdgeRoutingMode = EdgeRoutingMode.Rectilinear,
+                                             EdgeRoutingMode =
+                                               EdgeRoutingMode
+                                                 .RectilinearToCenter,
+                                             RouteMultiEdgesAsBundles = false,
                                            }
-                                        });
+                                       });
       }
     }
-
-
-    Graph.RootCluster.BoundingBox = Graph.RootCluster.BoundingBox with
-    {
-      Center = new Point(xCoordinate: Graph.BoundingBox.Center.X,
-                         yCoordinate: Graph.BoundingBox.Center.Y),
-    };
 
     Graph.MinimalHeight = diagramSettings.Height;
     Graph.MinimalWidth = diagramSettings.Width;
