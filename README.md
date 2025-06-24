@@ -19,8 +19,9 @@ dotnet add package FluentDiagrams.NET --version 0.0.1-alpha
 ```
 
 ## Usage
+![Diagram](./docs/imgs/example.png)
 
-building :)
+building it (is just a example for now!)
 
 ## Additional documentation
 
