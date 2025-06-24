@@ -136,6 +136,8 @@ public class MsaglLayoutEngine
         EdgeRoutingMode = EdgeRoutingMode.RectilinearToCenter,
         RouteMultiEdgesAsBundles = true,
       },
+      NodeSeparation = 20,
+      ClusterMargin = 50,
       ClusterSettings =
         new Dictionary<object, LayoutAlgorithmSettings>()
         {
@@ -144,28 +146,26 @@ public class MsaglLayoutEngine
             {
               Transformation =
                 PlaneTransformation.Rotation(angle: Math.PI / 2),
-              ClusterMargin = 30,
               NodeSeparation = 40,
-              LayerSeparation = 40,
+              ClusterMargin = 30,
+              LiftCrossEdges = true,
               EdgeRoutingSettings =
                 new EdgeRoutingSettings
                 {
                   EdgeRoutingMode = EdgeRoutingMode.RectilinearToCenter,
-                  RouteMultiEdgesAsBundles = true,
-
                 },
             }
           }
         },
     };
 
-    foreach (IElement? containers in Graph.RootCluster.Clusters.Select(selector: x => x.UserData as IElement))
+    foreach (Cluster cluster in Graph.RootCluster.Clusters)
     {
       if (!settings.ClusterSettings
-                   .ContainsKey(key: containers.Id))
+                   .ContainsKey(key: ((IElement)cluster.UserData).Id))
       {
         settings.ClusterSettings.Add(
-                                     key: containers.Id,
+                                     key: ((IElement)cluster.UserData).Id,
                                      value: new
                                        SugiyamaLayoutSettings()
                                        {
@@ -174,22 +174,22 @@ public class MsaglLayoutEngine
                                              .Rotation(angle:
                                                - Math.PI / 2),
                                          NodeSeparation = 25,
-                                         ClusterMargin = 35,
                                          LayerSeparation = 45,
-                                         EdgeRoutingSettings =
+                                        EdgeRoutingSettings =
                                            new EdgeRoutingSettings
                                            {
                                              EdgeRoutingMode =
                                                EdgeRoutingMode
                                                  .RectilinearToCenter,
-                                             RouteMultiEdgesAsBundles = false,
                                            }
                                        });
+
       }
     }
 
     Graph.MinimalHeight = diagramSettings.Height;
     Graph.MinimalWidth = diagramSettings.Width;
+    Graph.Margins = 20;
 
     LayoutHelpers
       .CalculateLayout(geometryGraph: Graph,

@@ -153,7 +153,12 @@ public static class DiagramRender
   private static void DrawCluster(SKCanvas canvas, Cluster? cluster)
   {
     if (cluster == null) return;
+
+    Rectangle a = cluster.BoundingBox;
+
     Rectangle box = cluster.BoundingBox;
+
+    box.Pad(padding: 30);
 
     using SKPaint clusterPaint = new();
 
@@ -173,6 +178,14 @@ public static class DiagramRender
                           bottom: (float)box.Top
                          );
 
+    using FileStream imgStream =
+      File.OpenRead(path: ((IElement)cluster.UserData).ImagePath);
+
+    using SKBitmap? skBitmap = SKBitmap.Decode(stream: imgStream);
+
+
+    canvas.DrawBitmap(bitmap: skBitmap, x: (float)box.Left, y: (float)box.Bottom);
+
     canvas.DrawRect(rect: rect, paint: clusterPaint);
   }
 
@@ -181,7 +194,10 @@ public static class DiagramRender
     GeometryGraph graph,
     DiagramSettings settings)
   {
+
     Rectangle currentBox = graph.RootCluster.BoundingBox;
+
+    currentBox.Pad(padding: 30);
 
     double boxWidth = currentBox.Right - currentBox.Left;
     double boxHeight = currentBox.Top - currentBox.Bottom;
