@@ -7,7 +7,7 @@ public class Vpc(string id) : IContainer
 {
   public List<IElement> Elements { get; private set; } = [];
 
-  public IComposable AddElement(IElement element)
+  IComposable IComposable.AddElement(IElement element)
   {
     Elements.Add(item: element);
     return this;

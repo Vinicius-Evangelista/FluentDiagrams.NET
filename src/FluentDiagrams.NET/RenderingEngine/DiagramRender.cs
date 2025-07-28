@@ -31,12 +31,6 @@ public static class DiagramRender
     foreach (Cluster? cluster in graph.RootCluster.Clusters)
       DrawCluster(canvas: canvas, cluster: cluster);
 
-    if (graph.RootCluster.BoundingBox != null)
-    {
-      DrawRootClusterBoundingBox(canvas: canvas, graph: graph,
-                                 settings: settings);
-    }
-
     if (graph.BoundingBox != null)
       DrawGraphBoundingBox(canvas: canvas, graph: graph);
 
@@ -187,58 +181,6 @@ public static class DiagramRender
     canvas.DrawBitmap(bitmap: skBitmap, x: (float)box.Left, y: (float)box.Bottom);
 
     canvas.DrawRect(rect: rect, paint: clusterPaint);
-  }
-
-  private static void DrawRootClusterBoundingBox(
-    SKCanvas canvas,
-    GeometryGraph graph,
-    DiagramSettings settings)
-  {
-
-    Rectangle currentBox = graph.RootCluster.BoundingBox;
-
-    currentBox.Pad(padding: 30);
-
-    double boxWidth = currentBox.Right - currentBox.Left;
-    double boxHeight = currentBox.Top - currentBox.Bottom;
-
-    double centerX = settings.Width / 2;
-    double centerY = settings.Height / 2;
-
-
-    var newBoundingBox = new Rectangle(
-                                       x0: centerX - boxWidth / 2,
-                                       y0: centerY - boxHeight / 2,
-                                       x1: centerX + boxWidth / 2,
-                                       y1: centerY + boxHeight / 2
-                                      );
-    graph.RootCluster.BoundingBox = new Rectangle
-    {
-      Left = newBoundingBox.Left,
-      Bottom = newBoundingBox.Bottom,
-      Right = newBoundingBox.Right,
-      Top = newBoundingBox.Top
-    };
-
-    using SKPaint rootClusterPaint = new();
-
-    rootClusterPaint.Color = SKColors.Gray;
-    rootClusterPaint.StrokeWidth = 2;
-    rootClusterPaint.IsAntialias = true;
-    rootClusterPaint.Style = SKPaintStyle.Stroke;
-    rootClusterPaint.PathEffect =
-      SKPathEffect.CreateDash(intervals: new float[] { 8, 6 },
-                              phase: 0);
-
-    var rootRect = new SKRect(
-                              left: (float)newBoundingBox.Left,
-                              top: (float)newBoundingBox.Bottom,
-                              right: (float)newBoundingBox.Right,
-                              bottom: (float)newBoundingBox.Top
-                             );
-
-
-    canvas.DrawRect(rect: rootRect, paint: rootClusterPaint);
   }
 
   private static void DrawGraphBoundingBox(

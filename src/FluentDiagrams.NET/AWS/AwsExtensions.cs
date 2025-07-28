@@ -24,7 +24,4 @@ public static class AwsExtensions
     Diagram.AddContainer(container: vpc);
     return Diagram;
   }
-
-  public static IDiagram Render(this IComposable diagram) =>
-    Diagram;
 }

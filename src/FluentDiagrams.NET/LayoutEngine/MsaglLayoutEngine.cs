@@ -8,14 +8,14 @@ using Microsoft.Msagl.Miscellaneous;
 
 namespace FluentDiagrams.NET.LayoutEngine;
 
-public class MsaglLayoutEngine
+class MsaglLayoutEngine
 {
   public static GeometryGraph Graph { get; private set; } = new();
 
   static MsaglLayoutEngine() =>
     Graph.RootCluster.UserData = 1;
 
-  public Node AddNode(IElement element)
+  internal Node AddNode(IElement element)
   {
     Node? existingNode =
       Graph.Nodes.FirstOrDefault(predicate: x =>
@@ -41,7 +41,7 @@ public class MsaglLayoutEngine
     return node;
   }
 
-  public void AddCluster(IContainer container)
+  internal void AddCluster(IContainer container)
   {
     if (container is null)
       throw new ArgumentNullException(paramName: nameof(container));
@@ -93,7 +93,7 @@ public class MsaglLayoutEngine
   }
 
 
-  public void AddEdge(IElement source, IElement target)
+  internal void AddEdge(IElement source, IElement target)
   {
     if (string.IsNullOrEmpty(value: source.ImagePath) ||
         string.IsNullOrEmpty(value: target.ImagePath))
@@ -144,8 +144,11 @@ public class MsaglLayoutEngine
           {
             1, new SugiyamaLayoutSettings()
             {
+
               Transformation =
                 PlaneTransformation.Rotation(angle: Math.PI / 2),
+              MinimalWidth = 3000,
+              MinimalHeight = 1000,
               NodeSeparation = 40,
               ClusterMargin = 30,
               LiftCrossEdges = true,
@@ -173,6 +176,7 @@ public class MsaglLayoutEngine
                                            PlaneTransformation
                                              .Rotation(angle:
                                                - Math.PI / 2),
+                                         ClusterMargin = 40,
                                          NodeSeparation = 25,
                                          LayerSeparation = 45,
                                         EdgeRoutingSettings =
@@ -189,7 +193,7 @@ public class MsaglLayoutEngine
 
     Graph.MinimalHeight = diagramSettings.Height;
     Graph.MinimalWidth = diagramSettings.Width;
-    Graph.Margins = 20;
+    Graph.Margins = 50;
 
     LayoutHelpers
       .CalculateLayout(geometryGraph: Graph,
